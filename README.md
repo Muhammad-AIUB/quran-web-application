@@ -46,7 +46,7 @@ quran-web-application/
 ├── backend/
 │   ├── data/                 # surahs.json, surah/{1..114}.json
 │   └── src/
-│       ├── app.ts            # Hono app, CORS, /health
+│       ├── createApp.ts      # Hono app factory, CORS, /health
 │       ├── node-server.ts
 │       ├── routes/           # quran routes
 │       └── services/         # load JSON, search

@@ -1,4 +1,4 @@
-import { createApp } from "./app.js";
+import { createApp } from "./createApp.js";
 import type { Hono } from "hono";
 
 let app: Hono | undefined;
