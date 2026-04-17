@@ -15,7 +15,7 @@ export default function SurahIndexPage() {
 
       <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 xl:gap-6">
         {list.map((s) => (
-          <li key={s.id} className="min-w-0">
+          <li key={s.id} className="min-w-0" suppressHydrationWarning>
             <SurahCard surah={s} />
           </li>
         ))}

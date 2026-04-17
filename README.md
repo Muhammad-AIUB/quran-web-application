@@ -1,173 +1,177 @@
 # Quran Web Application
 
-Production-oriented full-stack app to read the Quran in the browser: **114 surahs**, **ayah pages**, **translation search**, and **persistent reading settings** (fonts and sizes). Content comes from [**risan/quran-json**](https://github.com/risan/quran-json) (English surah metadata + Saheeh International translations in the bundled dataset).
+## Overview
 
-## Live demo
+A full-stack web app for reading the Quran in the browser: **114 surahs**, **per-surah ayah pages**, **English translation search**, and **persistent typography settings**.  
+Built as a static-data, API-backed architecture—no database. Text and translations are bundled from [**risan/quran-json**](https://github.com/risan/quran-json).
 
-- **Frontend:** add your Vercel URL after deployment (see below).
-- **API:** add your Render/Railway URL after deployment.
+## Tech Stack
 
-## Tech stack
-
-| Layer    | Choice |
-| -------- | ------ |
-| Frontend | Next.js 15 (App Router), Tailwind CSS, `next-themes`, **React Context** + **localStorage** (settings) |
-| Backend  | Node.js, **Hono**, TypeScript |
-| Data     | Local JSON under `backend/data` (from `quran-json` `dist/chapters/en`) |
-| Tests    | Vitest — backend (API + service) + frontend (utils) |
-
-**Architecture (detail):** see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
-
-- **Surah list** — SSG from `frontend/data/surahs.json`.
-- **Ayah pages** — SSG (`generateStaticParams` 1–114) from `frontend/data/surah/{id}.json`.
-- **Search** — `GET /search?q=` on the Hono API (in-memory index built at API startup).
-
-## Repository layout
-
-```
-backend/
-  data/              # surahs.json + surah/{id}.json (local copy of quran-json dist)
-  src/
-    app.ts           # Hono + CORS
-    server.ts        # listen()
-    routes/          # GET /surahs, /surah/:id, /search
-    services/        # load JSON once, in-memory search index
-frontend/
-  app/               # App Router pages
-  components/
-  context/           # SettingsContext → localStorage
-  utils/             # api client, types, highlight, font clamps
-  data/              # same JSON as backend (for SSG without calling API)
-```
-
-## API
-
-Base URL: `NEXT_PUBLIC_API_URL` (e.g. `http://localhost:8787`).
-
-| Method | Path | Description |
-| ------ | ---- | ----------- |
-| `GET` | `/health` | Liveness |
-| `GET` | `/surahs` | All surahs (metadata) |
-| `GET` | `/surah/:id` | One surah with `verses` (`id` 1–114) |
-| `GET` | `/search?q=` | Search ayahs by **English translation** (`includes`, normalized) |
-
-Optional: `GET /search?limit=50` (default 120, max 200).
-
-## Setup
-
-### Prerequisites
-
-- Node.js 20+
-- npm
-
-### 1. Backend
-
-```bash
-cd backend
-cp .env.example .env   # optional
-npm install
-npm run dev            # http://localhost:8787
-```
-
-Environment:
-
-| Variable | Default | Purpose |
-| -------- | ------- | ------- |
-| `PORT` | `8787` | HTTP port |
-| `CORS_ORIGIN` | `http://localhost:3000` | Comma-separated allowed origins |
-| `DATA_DIR` | `./data` (from compiled output) | Override JSON directory |
-
-### 2. Frontend
-
-```bash
-cd frontend
-cp .env.example .env.local
-# Set NEXT_PUBLIC_API_URL to your API origin (e.g. http://localhost:8787)
-npm install
-npm run dev            # http://localhost:3000
-```
-
-### 3. Run both (from repo root)
-
-```bash
-npm install
-npm run dev
-```
-
-### Tests
-
-```bash
-npm test
-# or
-cd backend && npm test
-cd frontend && npm test
-```
-
-Manual QA and API smoke examples: see **`docs/QA-MANUAL-CHECKLIST.md`**, **`docs/QA-ENGINEERING-REPORT.md`**, and **`docs/smoke-api.http`**.
-
-## Deployment
-
-### Frontend (Vercel)
-
-1. Import the GitHub repo; set **Root Directory** to `frontend`.
-2. Environment variable: `NEXT_PUBLIC_API_URL` = your **public API URL** (https, no trailing slash).
-3. Deploy. Redeploy when the API URL changes.
-
-### Backend (Render / Railway)
-
-1. **Root Directory:** `backend`.
-2. **Build command:** `npm install && npm run build`
-3. **Start command:** `npm start`
-4. **Environment:**
-   - `PORT` — usually provided by the platform (Render/Railway set `PORT` automatically).
-   - `CORS_ORIGIN` — your Vercel site origin, e.g. `https://your-app.vercel.app` (comma-separate if multiple).
-
-Ensure the service has the `data/` folder in the deployment artifact (it lives in the repo under `backend/data`).
-
-### CORS & incognito
-
-- Open the deployed site in a **private window** to verify no stale cookies; settings use **localStorage** only.
-- If the browser blocks requests, check `CORS_ORIGIN` matches the exact scheme + host of the frontend.
+- **Frontend:** Next.js 15 (App Router, SSG), React 19, Tailwind CSS, `next-themes`, React **Context** for settings with **`localStorage`** persistence and **hydration-safe** initialization
+- **Backend:** Node.js, Hono, TypeScript
+- **Data:** JSON on disk (surah index + per-surah files), loaded once into memory on the API
+- **Tests:** Vitest (backend API/service, frontend utilities)
 
 ## Features
 
-- Surah list with Arabic + English names; meccan/medinan badge
-- Ayah view: Arabic, English translation, transliteration; anchor links from search (`/surah/2#2-255`)
-- Translation search with highlight
-- Settings: Arabic font (Amiri / Scheherazade New), Arabic size, translation size (persisted)
-- Dark mode toggle (bonus)
-- Debounced search (bonus)
+**Frontend**
 
-## Data source
+- Surah index with Arabic name, transliteration, English title, Meccan/Medinan
+- Ayah reading view (Arabic, translation, transliteration) with SSG for routes `/surah/[id]`
+- Translation search UI with debounced requests and match highlighting
+- Reading settings: Arabic typeface (≥2 options), Arabic size, translation size—**React Context** + **`localStorage`**, with **hydration-safe** initialization (stable defaults for SSR/first paint, then apply stored values after mount)
+- Responsive layout: app shell, mobile settings drawer, desktop settings sidebar
+- Theme toggle (light / dark / system)
 
-JSON is from [**risan/quran-json**](https://github.com/risan/quran-json) (`dist/chapters/en/index.json` → `surahs.json`, `dist/chapters/en/{n}.json` → `surah/{n}.json`).  
-Reading (surah list + ayah pages) uses bundled JSON in the frontend build. **Search** uses the Hono API index in production.
+**Backend**
 
-## Assignment / submission checklist
+- REST API over JSON corpus: list surahs, fetch one surah, search ayahs by translation text
+- In-memory search index built at startup (normalized English text)
+- CORS configurable for deployed frontend origin(s)
+- Health check endpoint for uptime monitoring
 
-Use one email and include all three items:
+## System Architecture
 
-| Submit | Notes |
-| ------ | ----- |
-| **Public GitHub repo URL** | Repository visibility must be **Public**. |
-| **Live demo (Vercel or Netlify)** | Deploy the **frontend**; set `NEXT_PUBLIC_API_URL` to your deployed **API** URL. Test in **incognito** (extensions off) before sending. |
-| **Screen recording (≤ 5 min)** | Show: surah list (Arabic + English), one full ayah page, search by translation, settings (fonts + sizes) persisting after refresh, responsive or mobile width. |
+```
+User → Next.js (static pages + client fetch) → Hono API → in-memory JSON (loaded from disk at startup)
+```
 
-**Requirement mapping**
+- **Surah list and ayah pages** are generated from JSON in `frontend/data` at build time (SSG).
+- **Search** calls the API (`GET /search`), which queries the in-memory index derived from `backend/data`.
 
-| Requirement | Implementation |
-| ----------- | -------------- |
-| Quran DB from online (e.g. GitHub) | [risan/quran-json](https://github.com/risan/quran-json), files under `backend/data` and `frontend/data` |
-| Backend Node (Hono allowed) | Hono + Node in `backend/` |
-| Frontend Next.js + **SSG** | Surah list + **114 ayah routes** prerendered (`● SSG` in `next build`); home/search static |
-| Tailwind CSS | Used throughout |
-| Responsive UI | Mobile nav, settings drawer on small screens; **settings sidebar** on `lg+` |
-| Surah list 114, Arabic + English | `/surah` |
-| Ayah page: Arabic + translation | `/surah/[id]` |
-| Search by translation | `/search` → API `GET /search` |
-| Settings: ≥2 Arabic fonts, Arabic size, translation size, **localStorage** | `SettingsContext`; sidebar + mobile panel |
+## Folder Structure
 
-## License
+```
+quran-web-application/
+├── backend/
+│   ├── data/                 # surahs.json, surah/{1..114}.json
+│   └── src/
+│       ├── app.ts            # Hono app, CORS, /health
+│       ├── server.ts
+│       ├── routes/           # quran routes
+│       └── services/         # load JSON, search
+├── frontend/
+│   ├── app/                  # App Router pages
+│   ├── components/
+│   ├── context/              # settings (localStorage)
+│   ├── data/                 # mirror of JSON for SSG
+│   └── utils/                # API client, types, fonts, highlight
+├── docs/                     # architecture notes, smoke HTTP, QA checklists
+├── package.json              # root scripts: dev, build, test
+└── README.md
+```
 
-Project code: MIT (add a `LICENSE` file if you need a formal statement).  
-Quran text and translations: see attributions in [risan/quran-json](https://github.com/risan/quran-json).
+## Setup
+
+1. **Clone the repository**
+
+   ```bash
+   git clone <repository-url>
+   cd quran-web-application
+   ```
+
+2. **Install backend dependencies**
+
+   ```bash
+   cd backend
+   cp .env.example .env
+   npm install
+   ```
+
+3. **Install frontend dependencies**
+
+   ```bash
+   cd ../frontend
+   cp .env.example .env.local
+   npm install
+   ```
+
+4. **Run the API** (from `backend/`)
+
+   ```bash
+   npm run dev
+   ```
+
+   Default: `http://localhost:8787`
+
+5. **Run the web app** (from `frontend/`, second terminal)
+
+   ```bash
+   npm run dev
+   ```
+
+   Default: `http://localhost:3000`
+
+**Environment variables**
+
+`backend/.env`
+
+```env
+PORT=8787
+CORS_ORIGIN=http://localhost:3000
+# Optional: DATA_DIR=/absolute/path/to/data
+```
+
+`frontend/.env.local`
+
+```env
+NEXT_PUBLIC_API_URL=http://localhost:8787
+```
+
+**Run API + web together** (optional, from repository root after `npm install`):
+
+```bash
+npm run dev
+```
+
+## API Endpoints
+
+| Method | Path | Input | Output |
+| ------ | ---- | ----- | ------ |
+| `GET` | `/health` | — | `{ status, service, timestamp }` — liveness |
+| `GET` | `/surahs` | — | `{ data: SurahSummary[] }` |
+| `GET` | `/surah/:id` | `id` integer **1–114** | `{ data: SurahWithVerses }` or `400` / `404` |
+| `GET` | `/search` | `q` (string), optional `limit` (1–200, default 120) | `{ data: Hit[], query }` — translation substring search (normalized) |
+
+Query length is capped server-side (very long input is truncated before search).
+
+## Edge Cases Handled
+
+- **Empty or whitespace-only search** — API returns an empty result set; UI prompts the user to enter a query where appropriate.
+- **No search results** — Empty state in the search UI.
+- **Invalid surah id** (not 1–114, or non-numeric) — API responds with `400`; missing surah data returns `404`.
+- **Missing or corrupt JSON** — API initialization fails fast at startup if data cannot be loaded (process error); invalid `localStorage` settings fall back to defaults.
+- **First visit / empty `localStorage`** — Default font and sizes applied until the user saves settings.
+- **Large font sizes** — Arabic and translation sizes are clamped to safe ranges so layout remains usable.
+
+## Testing Approach
+
+- **Smoke testing** — Run API (`/health`, `/surahs`, `/surah/1`, `/search?q=mercy`) and open main UI flows (list → surah → search). Example HTTP requests: `docs/smoke-api.http`.
+- **Automated** — `npm test` at repo root runs backend + frontend Vitest suites (route/service behavior, utilities).
+- **Manual checklist (short)**  
+  - Surah list loads and links resolve for several ids (1, 2, 114).  
+  - Search returns expected hits and handles API offline (error message).  
+  - Settings persist after reload; sliders respect min/max.  
+  - Responsive: drawer vs sidebar at breakpoints.  
+  - Deployed: CORS and `NEXT_PUBLIC_API_URL` verified against production API.
+
+## Future Improvements
+
+- Bookmark system and reading progress
+- Dark mode (additional palettes, contrast, scheduling)
+- Offline support (PWA, cached surah JSON)
+- Advanced search indexing (fuzzy match, optional Arabic token search)
+- Performance optimizations (bundle splitting, font strategy, HTTP caching)
+
+## Deployment
+
+- **Frontend (e.g. Vercel):** Project root **`frontend`**. Set **`NEXT_PUBLIC_API_URL`** to the public HTTPS API origin (no trailing slash). Redeploy when the API URL changes.
+- **Backend (e.g. Render, Railway):** Root **`backend`**. Build: `npm install && npm run build`. Start: `npm start`. Set **`PORT`** if the platform does not inject it. Set **`CORS_ORIGIN`** to your frontend origin (comma-separated for multiple).
+- **CORS:** Must include the exact scheme + host + port of the deployed web app, or the browser will block search requests.
+
+## Important Notes
+
+- **No database** — By design; the corpus is versioned JSON in the repo.
+- **Static data** — Same dataset under `backend/data` (API) and `frontend/data` (SSG); keep in sync when updating from upstream `quran-json`.
+- **In-memory API** — JSON is read at startup and held in memory for fast list/search; restarting the process reloads data.
+- **Attribution** — Quran text and translations: see [**risan/quran-json**](https://github.com/risan/quran-json).
