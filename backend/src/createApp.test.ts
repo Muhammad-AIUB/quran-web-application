@@ -4,6 +4,14 @@ import { createApp } from "./createApp.js";
 const app = createApp();
 
 describe("HTTP API", () => {
+  it("GET / returns HTML landing page", async () => {
+    const res = await app.request("http://test/");
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text).toContain("Quran API");
+    expect(res.headers.get("content-type")).toMatch(/text\/html/);
+  });
+
   it("GET /health", async () => {
     const res = await app.request("http://test/health");
     expect(res.status).toBe(200);
