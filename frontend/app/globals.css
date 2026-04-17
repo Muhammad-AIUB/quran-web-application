@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+body {
+  font-feature-settings: "kern" 1;
+}
+
+::selection {
+  background-color: rgba(16, 185, 129, 0.25);
+}

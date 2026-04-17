@@ -1,0 +1,95 @@
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+import type { SearchHit, SearchIndexRow, SurahDetail, SurahSummary } from "../types.js";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function defaultDataDir(): string {
+  const fromEnv = process.env.DATA_DIR;
+  if (fromEnv) return fromEnv;
+  return join(__dirname, "..", "..", "data");
+}
+
+function normalizeTranslation(s: string): string {
+  return s
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/\p{M}/gu, "");
+}
+
+type RawSurahMeta = SurahSummary & { link?: string };
+
+export class QuranService {
+  private dataDir = defaultDataDir();
+  private surahs: SurahSummary[] = [];
+  private surahById = new Map<number, SurahDetail>();
+  private searchIndex: SearchIndexRow[] = [];
+  private initialized = false;
+
+  initialize(): void {
+    if (this.initialized) return;
+
+    const surahsPath = join(this.dataDir, "surahs.json");
+    const raw = JSON.parse(readFileSync(surahsPath, "utf-8")) as RawSurahMeta[];
+    this.surahs = raw.map(({ link: _l, ...rest }) => rest);
+
+    const rows: SearchIndexRow[] = [];
+
+    for (const meta of this.surahs) {
+      const path = join(this.dataDir, "surah", `${meta.id}.json`);
+      const detail = JSON.parse(readFileSync(path, "utf-8")) as SurahDetail;
+      this.surahById.set(meta.id, detail);
+
+      for (const v of detail.verses) {
+        rows.push({
+          surahId: meta.id,
+          ayahNumber: v.id,
+          surahNameArabic: detail.name,
+          surahTransliteration: detail.transliteration,
+          surahTranslation: detail.translation,
+          text: v.text,
+          translation: v.translation,
+          transliteration: v.transliteration,
+          translationNormalized: normalizeTranslation(v.translation),
+        });
+      }
+    }
+
+    this.searchIndex = rows;
+    this.initialized = true;
+  }
+
+  getSurahs(): SurahSummary[] {
+    return this.surahs;
+  }
+
+  getSurah(id: number): SurahDetail | null {
+    return this.surahById.get(id) ?? null;
+  }
+
+  search(query: string, limit = 120): SearchHit[] {
+    const q = normalizeTranslation(query.trim());
+    if (!q) return [];
+
+    const hits: SearchHit[] = [];
+    for (const row of this.searchIndex) {
+      if (row.translationNormalized.includes(q)) {
+        hits.push({
+          surahId: row.surahId,
+          ayahNumber: row.ayahNumber,
+          surahNameArabic: row.surahNameArabic,
+          surahTransliteration: row.surahTransliteration,
+          surahTranslation: row.surahTranslation,
+          text: row.text,
+          translation: row.translation,
+          transliteration: row.transliteration,
+        });
+        if (hits.length >= limit) break;
+      }
+    }
+    return hits;
+  }
+}
+
+export const quranService = new QuranService();
