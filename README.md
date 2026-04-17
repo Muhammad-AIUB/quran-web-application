@@ -148,10 +148,11 @@ Query length is capped server-side (very long input is truncated before search).
 
 - **Smoke testing** — Run API (`/health`, `/surahs`, `/surah/1`, `/search?q=mercy`) and open main UI flows (list → surah → search). Example HTTP requests: `docs/smoke-api.http`.
 - **Automated** — `npm test` at repo root runs backend + frontend Vitest suites (route/service behavior, utilities).
+- **Settings persistence (`localStorage`)** — Manually verified across **normal page reload**, **hard reload** (bypass cache), and **new browser session** (same origin): typography choices remain applied and match DevTools → Application → Local Storage.
 - **Manual checklist (short)**  
   - Surah list loads and links resolve for several ids (1, 2, 114).  
   - Search returns expected hits and handles API offline (error message).  
-  - Settings persist after reload; sliders respect min/max.  
+  - Settings: sliders respect min/max; persistence covered above.  
   - Responsive: drawer vs sidebar at breakpoints.  
   - Deployed: CORS and `NEXT_PUBLIC_API_URL` verified against production API.
 
