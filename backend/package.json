@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/node-server.ts",
-    "build": "tsc",
+    "build": "tsc && node ./scripts/copy-data.mjs",
     "start": "node dist/node-server.js",
     "test": "vitest run",
     "test:watch": "vitest"

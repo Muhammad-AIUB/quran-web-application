@@ -12,6 +12,7 @@ function resolveDataDir(): string {
   const here = dirname(fileURLToPath(import.meta.url));
   const candidates = [
     join(process.cwd(), "data"),
+    join(process.cwd(), "dist", "data"),
     join(here, "..", "..", "data"),
     join(here, "data"),
   ];
