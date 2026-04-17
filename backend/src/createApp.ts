@@ -46,7 +46,7 @@ export function createApp(): Hono {
   <ul>
     <li><a href="/health"><code>/health</code></a> — liveness</li>
     <li><a href="/surahs"><code>/surahs</code></a> — surah index</li>
-    <li><code>/surah/1</code> … <code>/surah/114</code> — full surah</li>
+    <li><a href="/surah/1"><code>/surah/1</code></a> through <a href="/surah/114"><code>/surah/114</code></a> — full surah JSON</li>
     <li><a href="/search?q=mercy"><code>/search?q=…</code></a> — translation search</li>
   </ul>
 </body>
