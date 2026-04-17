@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { SearchResultCard } from "@/components/SearchResultCard";
 import { fetchSearch } from "@/utils/api";
+import { isAbortError } from "@/utils/abortError";
 import type { SearchHit } from "@/utils/types";
 import { useDebouncedValue } from "@/utils/useDebouncedValue";
 import { useEffect, useMemo, useState } from "react";
@@ -34,7 +35,7 @@ export default function SearchPage() {
         if (!ac.signal.aborted) setResults(data);
       })
       .catch((e: unknown) => {
-        if ((e as Error).name === "AbortError") return;
+        if (isAbortError(e)) return;
         setError("Could not reach the search service. Check that the API is running.");
       })
       .finally(() => {

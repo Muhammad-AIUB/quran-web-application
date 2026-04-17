@@ -1,9 +1,6 @@
 import { PageHeader } from "@/components/PageHeader";
 import { SurahCard } from "@/components/SurahCard";
-import type { SurahSummary } from "@/utils/types";
-import surahs from "@/data/surahs.json";
-
-const list = surahs as SurahSummary[];
+import { surahList as list } from "@/data/surahIndex";
 
 export default function SurahIndexPage() {
   return (

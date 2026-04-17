@@ -1,4 +1,5 @@
 import type { SearchHit } from "@/utils/types";
+import { parseSearchApiResponse } from "@/utils/parseSearchResponse";
 
 export function getApiBaseUrl(): string {
   const url = process.env.NEXT_PUBLIC_API_URL?.trim();
@@ -16,6 +17,6 @@ export async function fetchSearch(
     cache: "no-store",
   });
   if (!res.ok) throw new Error("Search failed");
-  const json = (await res.json()) as { data: SearchHit[] };
-  return json.data;
+  const json: unknown = await res.json();
+  return parseSearchApiResponse(json).data;
 }

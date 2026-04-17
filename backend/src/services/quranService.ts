@@ -1,15 +1,12 @@
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 import type { SearchHit, SearchIndexRow, SurahDetail, SurahSummary } from "../types.js";
 import { normalizeTranslation } from "../utils/normalizeTranslation.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function defaultDataDir(): string {
   const fromEnv = process.env.DATA_DIR;
   if (fromEnv) return fromEnv;
-  return join(__dirname, "..", "..", "data");
+  return join(process.cwd(), "data");
 }
 
 type RawSurahMeta = SurahSummary & { link?: string };

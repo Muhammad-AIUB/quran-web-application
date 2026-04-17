@@ -166,9 +166,28 @@ Query length is capped server-side (very long input is truncated before search).
 
 ## Deployment
 
-- **Frontend (e.g. Vercel):** Project root **`frontend`**. Set **`NEXT_PUBLIC_API_URL`** to the public HTTPS API origin (no trailing slash). Redeploy when the API URL changes.
-- **Backend (e.g. Render, Railway):** Root **`backend`**. Build: `npm install && npm run build`. Start: `npm start`. Set **`PORT`** if the platform does not inject it. Set **`CORS_ORIGIN`** to your frontend origin (comma-separated for multiple).
-- **CORS:** Must include the exact scheme + host + port of the deployed web app, or the browser will block search requests.
+### Vercel (frontend + API)
+
+Use **two Vercel projects** connected to the same Git repository, with different **Root Directory** settings.
+
+1. **API (deploy this first)**  
+   - **Root Directory:** `backend`  
+   - **Environment variables:**  
+     - **`CORS_ORIGIN`** — your deployed site origin(s), e.g. `https://your-app.vercel.app` (comma-separated if you have preview URLs you want to allow). Must match the browser origin exactly (scheme + host + port).  
+     - **`DATA_DIR`** — only if the default fails; normally unset so the API reads `data/` from the project root (`process.cwd()/data`).  
+   - The app entry for Vercel is `backend/src/index.ts` (default export). Local dev still uses `npm run dev` → `src/server.ts`.  
+   - `backend/vercel.json` ensures the JSON corpus under `data/**` is bundled with the serverless function.
+
+2. **Frontend**  
+   - **Root Directory:** `frontend`  
+   - **`NEXT_PUBLIC_API_URL`** — public HTTPS URL of the API project (no trailing slash), e.g. `https://your-api.vercel.app`. Redeploy the frontend after the API URL changes.
+
+3. **Smoke-check after deploy:** open `https://<api>/health`, then load the site and run a translation search once CORS and `NEXT_PUBLIC_API_URL` are set.
+
+### Other hosts (traditional Node server)
+
+- **Backend (e.g. Render, Railway):** Root **`backend`**. Build: `npm install && npm run build`. Start: `npm start`. Set **`PORT`** if the platform does not inject it. Set **`CORS_ORIGIN`** as above.  
+- **Frontend:** Same as Vercel: build the Next app from **`frontend`** and point **`NEXT_PUBLIC_API_URL`** at your API’s public URL.
 
 ## Important Notes
 

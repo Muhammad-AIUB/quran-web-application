@@ -3,7 +3,7 @@ import { cors } from "hono/cors";
 import { quranRoutes } from "./routes/quranRoutes.js";
 import { quranService } from "./services/quranService.js";
 
-export function createApp() {
+export function createApp(): Hono {
   quranService.initialize();
 
   const app = new Hono();
