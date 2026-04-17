@@ -1,19 +1,21 @@
 import { AyahList } from "@/components/AyahList";
-import { fetchSurah } from "@/lib/api";
+import { loadSurahFromDisk } from "@/lib/loadSurah";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-export const dynamic = "force-dynamic";
-
 type Props = { params: Promise<{ id: string }> };
+
+export function generateStaticParams() {
+  return Array.from({ length: 114 }, (_, i) => ({ id: String(i + 1) }));
+}
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
   const { id } = await props.params;
   const n = Number(id);
   if (!Number.isInteger(n) || n < 1 || n > 114) return { title: "Surah" };
   try {
-    const s = await fetchSurah(n);
+    const s = loadSurahFromDisk(n);
     return {
       title: `${s.transliteration} (${s.translation})`,
       description: `Read ${s.name} — ${s.total_verses} verses`,
@@ -30,7 +32,7 @@ export default async function SurahPage(props: Props) {
 
   let surah;
   try {
-    surah = await fetchSurah(n);
+    surah = loadSurahFromDisk(n);
   } catch {
     notFound();
   }

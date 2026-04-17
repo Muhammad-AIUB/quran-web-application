@@ -42,7 +42,8 @@ export function AppHeader() {
             <button
               type="button"
               onClick={() => setSettingsOpen(true)}
-              className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-800 shadow-sm transition hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800"
+              className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-800 shadow-sm transition hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800 lg:hidden"
+              aria-label="Open settings"
             >
               Settings
             </button>

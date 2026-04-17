@@ -25,9 +25,9 @@ flowchart LR
   API --> JSON[Local JSON + in-memory index]
 ```
 
-- **Surah list** is statically generated from `frontend/data/surahs.json` (a copy of the API/chapter index for fast SSG).
-- **Ayah pages** fetch `/surah/:id` from the API (dynamic SSR; good for split deployments).
-- **Search** calls `/search?q=` with a **debounced** client and highlights matches.
+- **Surah list** is statically generated from `frontend/data/surahs.json`.
+- **Ayah pages** use **SSG** (`generateStaticParams` for 1–114) and load text from `frontend/data/surah/{id}.json` at build time (same dataset as the API).
+- **Search** calls the Hono API `GET /search?q=` (debounced client + highlight); requires the API in production or a hosted backend.
 
 ## Repository layout
 
@@ -43,7 +43,9 @@ backend/           # Hono REST API + JSON data
 frontend/          # Next.js UI
   app/
   components/
-  data/surahs.json # Static metadata for SSG list
+  data/
+    surahs.json    # SSG surah list
+    surah/*.json   # SSG ayah pages (same source as backend/data/surah)
 ```
 
 ## API
@@ -144,7 +146,31 @@ Ensure the service has the `data/` folder in the deployment artifact (it lives i
 ## Data source
 
 JSON is from [**risan/quran-json**](https://github.com/risan/quran-json) (`dist/chapters/en/index.json` → `surahs.json`, `dist/chapters/en/{n}.json` → `surah/{n}.json`).  
-Fallback public APIs (alquran.cloud, etc.) are **not** wired in code; the app is designed to run fully offline against bundled files.
+Reading (surah list + ayah pages) uses bundled JSON in the frontend build. **Search** uses the Hono API index in production.
+
+## Assignment / submission checklist
+
+Use one email and include all three items:
+
+| Submit | Notes |
+| ------ | ----- |
+| **Public GitHub repo URL** | Repository visibility must be **Public**. |
+| **Live demo (Vercel or Netlify)** | Deploy the **frontend**; set `NEXT_PUBLIC_API_URL` to your deployed **API** URL. Test in **incognito** (extensions off) before sending. |
+| **Screen recording (≤ 5 min)** | Show: surah list (Arabic + English), one full ayah page, search by translation, settings (fonts + sizes) persisting after refresh, responsive or mobile width. |
+
+**Requirement mapping**
+
+| Requirement | Implementation |
+| ----------- | -------------- |
+| Quran DB from online (e.g. GitHub) | [risan/quran-json](https://github.com/risan/quran-json), files under `backend/data` and `frontend/data` |
+| Backend Node (Hono allowed) | Hono + Node in `backend/` |
+| Frontend Next.js + **SSG** | Surah list + **114 ayah routes** prerendered (`● SSG` in `next build`); home/search static |
+| Tailwind CSS | Used throughout |
+| Responsive UI | Mobile nav, settings drawer on small screens; **settings sidebar** on `lg+` |
+| Surah list 114, Arabic + English | `/surah` |
+| Ayah page: Arabic + translation | `/surah/[id]` |
+| Search by translation | `/search` → API `GET /search` |
+| Settings: ≥2 Arabic fonts, Arabic size, translation size, **localStorage** | Zustand `persist`; sidebar + mobile panel |
 
 ## License
 
