@@ -47,7 +47,7 @@ quran-web-application/
 │   ├── data/                 # surahs.json, surah/{1..114}.json
 │   └── src/
 │       ├── app.ts            # Hono app, CORS, /health
-│       ├── server.ts
+│       ├── node-server.ts
 │       ├── routes/           # quran routes
 │       └── services/         # load JSON, search
 ├── frontend/
@@ -175,7 +175,7 @@ Use **two Vercel projects** connected to the same Git repository, with different
    - **Environment variables:**  
      - **`CORS_ORIGIN`** — your deployed site origin(s), e.g. `https://your-app.vercel.app` (comma-separated if you have preview URLs you want to allow). Must match the browser origin exactly (scheme + host + port).  
      - **`DATA_DIR`** — only if the default fails; normally unset so the API reads `data/` from the project root (`process.cwd()/data`).  
-   - The app entry for Vercel is `backend/src/index.ts` (default export). Local dev still uses `npm run dev` → `src/server.ts`.  
+   - The app entry for Vercel is `backend/src/index.ts` (default export). Local dev uses `npm run dev` → `src/node-server.ts`.  
    - `backend/vercel.json` ensures the JSON corpus under `data/**` is bundled with the serverless function.
 
 2. **Frontend**  

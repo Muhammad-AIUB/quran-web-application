@@ -1,18 +1,32 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import type { SearchHit, SearchIndexRow, SurahDetail, SurahSummary } from "../types.js";
 import { normalizeTranslation } from "../utils/normalizeTranslation.js";
 
-function defaultDataDir(): string {
-  const fromEnv = process.env.DATA_DIR;
+/** Resolves `backend/data` for local `dist/`, Vercel bundles, and custom DATA_DIR. */
+function resolveDataDir(): string {
+  const fromEnv = process.env.DATA_DIR?.trim();
   if (fromEnv) return fromEnv;
+
+  const here = dirname(fileURLToPath(import.meta.url));
+  const candidates = [
+    join(process.cwd(), "data"),
+    join(here, "..", "..", "data"),
+    join(here, "data"),
+  ];
+
+  for (const dir of candidates) {
+    if (existsSync(join(dir, "surahs.json"))) return dir;
+  }
+
   return join(process.cwd(), "data");
 }
 
 type RawSurahMeta = SurahSummary & { link?: string };
 
 export class QuranService {
-  private dataDir = defaultDataDir();
+  private dataDir = resolveDataDir();
   private surahs: SurahSummary[] = [];
   private surahById = new Map<number, SurahDetail>();
   private searchIndex: SearchIndexRow[] = [];
