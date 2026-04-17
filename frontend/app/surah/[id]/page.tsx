@@ -1,5 +1,6 @@
 import { AyahList } from "@/components/AyahList";
-import { loadSurahFromDisk } from "@/lib/loadSurah";
+import { ReadingContainer } from "@/components/ReadingContainer";
+import { loadSurahFromDisk } from "@/utils/loadSurah";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -39,31 +40,46 @@ export default async function SurahPage(props: Props) {
 
   return (
     <div>
-      <div className="mb-8 border-b border-stone-200 pb-6 dark:border-stone-800">
-        <div className="flex flex-wrap items-center gap-2 text-sm text-stone-500 dark:text-stone-400">
-          <Link href="/surah" className="hover:text-emerald-800 dark:hover:text-emerald-300">
-            Surahs
-          </Link>
-          <span>/</span>
-          <span>Surah {surah.id}</span>
-        </div>
+      <header className="mb-10 border-b border-zinc-200/90 pb-8 dark:border-zinc-800">
+        <nav className="font-sans text-sm text-zinc-500 dark:text-zinc-400" aria-label="Breadcrumb">
+          <ol className="flex flex-wrap items-center gap-2">
+            <li>
+              <Link
+                href="/surah"
+                className="font-medium text-emerald-800 transition hover:text-emerald-900 dark:text-emerald-400 dark:hover:text-emerald-300"
+              >
+                Surahs
+              </Link>
+            </li>
+            <li aria-hidden className="text-zinc-300 dark:text-zinc-600">
+              /
+            </li>
+            <li className="text-zinc-600 dark:text-zinc-500">Surah {surah.id}</li>
+          </ol>
+        </nav>
+
         <h1
           dir="rtl"
           lang="ar"
-          className="mt-4 text-4xl font-semibold text-stone-900 dark:text-stone-50"
+          className="mt-6 text-center text-4xl font-normal leading-tight text-zinc-900 sm:text-5xl dark:text-zinc-50"
+          style={{ fontFamily: "var(--font-amiri), serif" }}
         >
           {surah.name}
         </h1>
-        <p className="mt-2 text-xl font-medium text-stone-800 dark:text-stone-200">
-          {surah.transliteration}{" "}
-          <span className="text-stone-500 dark:text-stone-400">· {surah.translation}</span>
+        <p className="mt-4 text-center font-sans text-lg font-medium text-zinc-800 dark:text-zinc-200">
+          {surah.transliteration}
         </p>
-        <p className="mt-2 text-sm text-stone-600 dark:text-stone-400">
+        <p className="mt-1 text-center font-sans text-base text-zinc-600 dark:text-zinc-400">
+          {surah.translation}
+        </p>
+        <p className="mt-4 text-center font-sans text-sm text-zinc-500 dark:text-zinc-500">
           {surah.type === "meccan" ? "Meccan" : "Medinan"} · {surah.total_verses} verses
         </p>
-      </div>
+      </header>
 
-      <AyahList surahId={surah.id} verses={surah.verses} />
+      <ReadingContainer>
+        <AyahList surahId={surah.id} verses={surah.verses} />
+      </ReadingContainer>
     </div>
   );
 }

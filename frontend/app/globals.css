@@ -4,16 +4,26 @@
 
 :root {
   color-scheme: light;
+  --background: #fafafa;
+  --foreground: #18181b;
 }
 
 .dark {
   color-scheme: dark;
+  --background: #09090b;
+  --foreground: #fafafa;
+}
+
+html {
+  overflow-x: hidden;
 }
 
 body {
-  font-feature-settings: "kern" 1;
+  overflow-x: hidden;
+  font-feature-settings: "kern" 1, "liga" 1;
+  -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: rgba(16, 185, 129, 0.25);
+  background-color: rgba(16, 185, 129, 0.22);
 }

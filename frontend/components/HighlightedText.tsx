@@ -1,6 +1,6 @@
 "use client";
 
-import { splitHighlight } from "@/lib/highlight";
+import { splitHighlight } from "@/utils/highlight";
 
 export function HighlightedText({
   text,
@@ -18,7 +18,7 @@ export function HighlightedText({
         p.match ? (
           <mark
             key={i}
-            className="rounded-sm bg-amber-200/90 px-0.5 text-inherit dark:bg-amber-500/40"
+            className="rounded bg-emerald-100/90 px-0.5 font-medium text-inherit dark:bg-emerald-900/50 dark:text-emerald-100"
           >
             {p.text}
           </mark>

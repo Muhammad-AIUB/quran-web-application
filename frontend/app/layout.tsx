@@ -1,9 +1,16 @@
 import { AppHeader } from "@/components/AppHeader";
+import { AppShell } from "@/components/AppShell";
 import { Providers } from "@/components/Providers";
 import { SettingsSidebarDesktop } from "@/components/SettingsSidebarDesktop";
 import type { Metadata } from "next";
-import { Amiri, Scheherazade_New } from "next/font/google";
+import { Amiri, Inter, Scheherazade_New } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 const amiri = Amiri({
   weight: ["400", "700"],
@@ -21,10 +28,10 @@ const scheherazade = Scheherazade_New({
 
 export const metadata: Metadata = {
   title: {
-    default: "Quran Web Application",
-    template: "%s · Quran Web",
+    default: "Quran — Read & search",
+    template: "%s · Quran",
   },
-  description: "Read the Quran with English translation, search, and customizable reading settings.",
+  description: "Read the Quran with English translation, search, and customizable typography.",
 };
 
 export default function RootLayout({
@@ -35,24 +42,26 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${amiri.variable} ${scheherazade.variable} min-h-screen bg-stone-50 text-stone-900 antialiased dark:bg-stone-950 dark:text-stone-50`}
+        className={`${inter.variable} ${amiri.variable} ${scheherazade.variable} min-h-screen overflow-x-hidden bg-zinc-50 font-sans text-zinc-900 antialiased dark:bg-zinc-950 dark:text-zinc-100`}
         suppressHydrationWarning
       >
         <Providers>
-          <div className="flex min-h-screen flex-col bg-stone-50 dark:bg-stone-950 lg:flex-row">
+          <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950 lg:flex-row">
             <div className="flex min-h-screen min-w-0 flex-1 flex-col">
               <AppHeader />
-              <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
-              <footer className="border-t border-stone-200 py-8 text-center text-xs text-stone-500 dark:border-stone-800 dark:text-stone-500">
-                Data:{" "}
-                <a
-                  className="underline decoration-stone-400 underline-offset-2 hover:text-stone-700 dark:hover:text-stone-300"
-                  href="https://github.com/risan/quran-json"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  risan/quran-json
-                </a>
+              <AppShell>{children}</AppShell>
+              <footer className="border-t border-zinc-200/90 py-8 text-center dark:border-zinc-800">
+                <p className="mx-auto max-w-6xl px-4 text-xs text-zinc-500 dark:text-zinc-500">
+                  Text &amp; translations:{" "}
+                  <a
+                    className="font-medium text-emerald-800 underline decoration-zinc-300 underline-offset-2 hover:text-emerald-900 dark:text-emerald-400 dark:decoration-zinc-600"
+                    href="https://github.com/risan/quran-json"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    risan/quran-json
+                  </a>
+                </p>
               </footer>
             </div>
             <SettingsSidebarDesktop />

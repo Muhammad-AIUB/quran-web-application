@@ -11,41 +11,33 @@ Production-oriented full-stack app to read the Quran in the browser: **114 surah
 
 | Layer    | Choice |
 | -------- | ------ |
-| Frontend | Next.js 15 (App Router), Tailwind CSS, `next-themes`, Zustand (persisted settings) |
+| Frontend | Next.js 15 (App Router), Tailwind CSS, `next-themes`, **React Context** + **localStorage** (settings) |
 | Backend  | Node.js, **Hono**, TypeScript |
 | Data     | Local JSON under `backend/data` (from `quran-json` `dist/chapters/en`) |
-| Tests    | Vitest (`backend`) — service + HTTP route smoke tests |
+| Tests    | Vitest — backend (API + service) + frontend (utils) |
 
-### Architecture
+**Architecture (detail):** see [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md).
 
-```mermaid
-flowchart LR
-  User[User] --> Next[Next.js]
-  Next --> API[Hono API]
-  API --> JSON[Local JSON + in-memory index]
-```
-
-- **Surah list** is statically generated from `frontend/data/surahs.json`.
-- **Ayah pages** use **SSG** (`generateStaticParams` for 1–114) and load text from `frontend/data/surah/{id}.json` at build time (same dataset as the API).
-- **Search** calls the Hono API `GET /search?q=` (debounced client + highlight); requires the API in production or a hosted backend.
+- **Surah list** — SSG from `frontend/data/surahs.json`.
+- **Ayah pages** — SSG (`generateStaticParams` 1–114) from `frontend/data/surah/{id}.json`.
+- **Search** — `GET /search?q=` on the Hono API (in-memory index built at API startup).
 
 ## Repository layout
 
 ```
-backend/           # Hono REST API + JSON data
-  data/
-    surahs.json
-    surah/*.json
+backend/
+  data/              # surahs.json + surah/{id}.json (local copy of quran-json dist)
   src/
-    app.ts         # App factory (CORS, routes)
-    server.ts      # Node entry (listen)
-    services/      # Load JSON, search index
-frontend/          # Next.js UI
-  app/
+    app.ts           # Hono + CORS
+    server.ts        # listen()
+    routes/          # GET /surahs, /surah/:id, /search
+    services/        # load JSON once, in-memory search index
+frontend/
+  app/               # App Router pages
   components/
-  data/
-    surahs.json    # SSG surah list
-    surah/*.json   # SSG ayah pages (same source as backend/data/surah)
+  context/           # SettingsContext → localStorage
+  utils/             # api client, types, highlight, font clamps
+  data/              # same JSON as backend (for SSG without calling API)
 ```
 
 ## API
@@ -173,7 +165,7 @@ Use one email and include all three items:
 | Surah list 114, Arabic + English | `/surah` |
 | Ayah page: Arabic + translation | `/surah/[id]` |
 | Search by translation | `/search` → API `GET /search` |
-| Settings: ≥2 Arabic fonts, Arabic size, translation size, **localStorage** | Zustand `persist`; sidebar + mobile panel |
+| Settings: ≥2 Arabic fonts, Arabic size, translation size, **localStorage** | `SettingsContext`; sidebar + mobile panel |
 
 ## License
 

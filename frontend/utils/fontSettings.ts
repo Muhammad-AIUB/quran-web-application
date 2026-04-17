@@ -1,4 +1,4 @@
-/** Shared bounds for reading settings (used by store + tests). */
+/** Bounds + sanitizers for reading settings (Context + tests). */
 export const ARABIC_SIZE_BOUNDS = { min: 20, max: 48, default: 28 } as const;
 export const TRANSLATION_SIZE_BOUNDS = { min: 12, max: 26, default: 17 } as const;
 

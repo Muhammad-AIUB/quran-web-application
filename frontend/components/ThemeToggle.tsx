@@ -11,7 +11,7 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 bg-white/60 dark:border-stone-700 dark:bg-stone-900/40" />
+      <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 bg-white/60 dark:border-zinc-700 dark:bg-zinc-900/40" />
     );
   }
 
@@ -21,7 +21,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 bg-white/80 text-sm font-medium text-stone-700 shadow-sm transition hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-900/60 dark:text-stone-200 dark:hover:bg-stone-800"
+      className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-200 bg-white text-sm font-medium text-zinc-700 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900/80 dark:text-zinc-200 dark:hover:bg-zinc-800"
       aria-label="Toggle dark mode"
       title="Toggle theme"
     >

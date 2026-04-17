@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
-import { useState } from "react";
-import { SettingsPanel } from "@/components/SettingsPanel";
+import { SettingsDrawer } from "@/components/SettingsDrawer";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { cn } from "@/utils/cn";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 const nav = [
   { href: "/", label: "Home" },
@@ -13,28 +15,42 @@ const nav = [
 
 export function AppHeader() {
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <>
-      <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-white/80 backdrop-blur-md dark:border-stone-800 dark:bg-stone-950/80">
-        <div className="mx-auto flex max-w-5xl items-center justify-between gap-3 px-4 py-3">
-          <Link href="/" className="flex flex-col leading-tight">
-            <span className="text-lg font-semibold tracking-tight text-emerald-900 dark:text-emerald-200">
+      <header className="sticky top-0 z-40 border-b border-zinc-200/90 bg-white/90 backdrop-blur-md dark:border-zinc-800 dark:bg-zinc-950/90">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-8">
+          <Link
+            href="/"
+            className="flex min-h-11 min-w-0 flex-col justify-center rounded-lg py-1 pr-2 leading-tight focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+          >
+            <span className="text-base font-semibold tracking-tight text-emerald-800 dark:text-emerald-400">
               Quran
             </span>
-            <span className="text-xs text-stone-500 dark:text-stone-400">Read &amp; reflect</span>
+            <span className="hidden text-[11px] font-normal text-zinc-500 dark:text-zinc-400 sm:block">
+              Read with clarity
+            </span>
           </Link>
 
-          <nav className="hidden items-center gap-1 sm:flex">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-stone-700 transition hover:bg-stone-100 dark:text-stone-200 dark:hover:bg-stone-900"
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-0.5 md:flex" aria-label="Primary">
+            {nav.map((item) => {
+              const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "min-h-11 rounded-xl px-4 py-2.5 text-sm font-medium transition",
+                    active
+                      ? "bg-emerald-50 text-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
+                      : "text-zinc-700 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-900",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-2">
@@ -42,52 +58,38 @@ export function AppHeader() {
             <button
               type="button"
               onClick={() => setSettingsOpen(true)}
-              className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-medium text-stone-800 shadow-sm transition hover:bg-stone-50 dark:border-stone-700 dark:bg-stone-900 dark:text-stone-100 dark:hover:bg-stone-800 lg:hidden"
-              aria-label="Open settings"
+              className="min-h-11 min-w-11 rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 lg:hidden"
+              aria-label="Open reading settings"
             >
-              Settings
+              Aa
             </button>
           </div>
         </div>
 
-        <div className="border-t border-stone-100 px-4 py-2 sm:hidden dark:border-stone-900">
-          <nav className="flex flex-wrap gap-2">
-            {nav.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="rounded-md bg-stone-100 px-2.5 py-1.5 text-xs font-medium text-stone-800 dark:bg-stone-900 dark:text-stone-200"
-              >
-                {item.label}
-              </Link>
-            ))}
+        <div className="border-t border-zinc-100 px-4 pb-3 pt-2 dark:border-zinc-900 md:hidden">
+          <nav className="grid grid-cols-3 gap-2" aria-label="Mobile">
+            {nav.map((item) => {
+              const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={cn(
+                    "flex min-h-11 items-center justify-center rounded-xl px-2 py-2.5 text-center text-xs font-semibold transition",
+                    active
+                      ? "bg-emerald-600 text-white dark:bg-emerald-700"
+                      : "bg-zinc-100 text-zinc-800 dark:bg-zinc-900 dark:text-zinc-200",
+                  )}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </header>
 
-      {settingsOpen ? (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/40 p-4 sm:p-6">
-          <button
-            type="button"
-            className="absolute inset-0 cursor-default"
-            aria-label="Close settings"
-            onClick={() => setSettingsOpen(false)}
-          />
-          <aside className="relative z-10 w-full max-w-sm overflow-y-auto rounded-2xl border border-stone-200 bg-white p-5 shadow-2xl dark:border-stone-800 dark:bg-stone-950">
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-stone-900 dark:text-stone-50">Settings</h2>
-              <button
-                type="button"
-                onClick={() => setSettingsOpen(false)}
-                className="rounded-lg px-2 py-1 text-sm text-stone-500 hover:bg-stone-100 dark:text-stone-400 dark:hover:bg-stone-900"
-              >
-                Close
-              </button>
-            </div>
-            <SettingsPanel />
-          </aside>
-        </div>
-      ) : null}
+      <SettingsDrawer open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </>
   );
 }
