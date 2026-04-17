@@ -46,8 +46,8 @@ export default function RootLayout({
         suppressHydrationWarning
       >
         <Providers>
-          <div className="flex min-h-screen flex-col bg-zinc-50 dark:bg-zinc-950 lg:flex-row">
-            <div className="flex min-h-screen min-w-0 flex-1 flex-col">
+          <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+            <div className="flex min-h-screen min-w-0 flex-col lg:pr-80">
               <AppHeader />
               <AppShell>{children}</AppShell>
               <footer className="border-t border-zinc-200/90 py-8 text-center dark:border-zinc-800">
