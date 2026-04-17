@@ -58,10 +58,24 @@ export function AppHeader() {
             <button
               type="button"
               onClick={() => setSettingsOpen(true)}
-              className="min-h-11 min-w-11 rounded-xl border border-zinc-200 bg-white px-4 text-sm font-medium text-zinc-800 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 lg:hidden"
+              className="flex min-h-11 min-w-11 items-center justify-center rounded-xl border border-zinc-200 bg-white px-3 text-zinc-800 shadow-sm transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:hover:bg-zinc-800 lg:hidden"
               aria-label="Open reading settings"
             >
-              Aa
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="h-5 w-5"
+                aria-hidden
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M10.5 6h9.75M10.5 6a1.125 1.125 0 1 1-2.25 0m2.25 0a1.125 1.125 0 1 1-2.25 0M3.75 6h5.25m0 0a1.125 1.125 0 1 1-2.25 0m2.25 0a1.125 1.125 0 1 1-2.25 0m0 4.5h12.75m0 0a1.125 1.125 0 0 1-2.25 0m2.25 0a1.125 1.125 0 0 1-2.25 0M3.75 12h7.5m0 0a1.125 1.125 0 0 1-2.25 0m2.25 0a1.125 1.125 0 0 1-2.25 0m0 4.5h15.75m0 0a1.125 1.125 0 0 1-2.25 0m2.25 0a1.125 1.125 0 0 1-2.25 0M3.75 18h9.75m0 0a1.125 1.125 0 0 1-2.25 0m2.25 0a1.125 1.125 0 0 1-2.25 0"
+                />
+              </svg>
             </button>
           </div>
         </div>
