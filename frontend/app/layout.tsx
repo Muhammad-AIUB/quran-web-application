@@ -50,19 +50,6 @@ export default function RootLayout({
             <div className="flex min-h-screen min-w-0 flex-col lg:pr-80">
               <AppHeader />
               <AppShell>{children}</AppShell>
-              <footer className="border-t border-zinc-200/90 py-8 text-center dark:border-zinc-800">
-                <p className="mx-auto max-w-6xl px-4 text-xs text-zinc-500 dark:text-zinc-500">
-                  Text &amp; translations:{" "}
-                  <a
-                    className="font-medium text-emerald-800 underline decoration-zinc-300 underline-offset-2 hover:text-emerald-900 dark:text-emerald-400 dark:decoration-zinc-600"
-                    href="https://github.com/risan/quran-json"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    risan/quran-json
-                  </a>
-                </p>
-              </footer>
             </div>
             <SettingsSidebarDesktop />
           </div>
