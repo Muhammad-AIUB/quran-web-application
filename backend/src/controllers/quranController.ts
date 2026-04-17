@@ -15,10 +15,21 @@ export function getSurahById(c: Context) {
   return c.json({ data: surah });
 }
 
+function parseLimit(raw: string | undefined, fallback: number): number {
+  if (raw === undefined || raw === "") return fallback;
+  const n = Number(raw);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.min(200, Math.max(1, Math.trunc(n)));
+}
+
+const MAX_QUERY_LEN = 4000;
+
 export function searchAyahs(c: Context) {
-  const q = c.req.query("q") ?? "";
-  const limitRaw = c.req.query("limit");
-  const limit = limitRaw ? Math.min(200, Math.max(1, Number(limitRaw))) : 120;
-  const hits = quranService.search(q, Number.isFinite(limit) ? limit : 120);
+  let q = c.req.query("q") ?? "";
+  if (q.length > MAX_QUERY_LEN) {
+    q = q.slice(0, MAX_QUERY_LEN);
+  }
+  const limit = parseLimit(c.req.query("limit"), 120);
+  const hits = quranService.search(q, limit);
   return c.json({ data: hits, query: q.trim() });
 }

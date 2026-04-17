@@ -1,0 +1,25 @@
+### Quran API smoke (VS Code REST Client / IntelliJ HTTP Client)
+### Set @base to your API origin (no trailing slash)
+
+@base = http://localhost:8787
+
+### Health
+GET {{base}}/health
+
+### All surahs
+GET {{base}}/surahs
+
+### Al-Fatihah
+GET {{base}}/surah/1
+
+### Invalid id
+GET {{base}}/surah/999
+
+### Search — empty
+GET {{base}}/search?q=
+
+### Search — match
+GET {{base}}/search?q=mercy&limit=10
+
+### Search — invalid limit (should still 200, default limit)
+GET {{base}}/search?q=god&limit=nan

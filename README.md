@@ -108,7 +108,10 @@ npm run dev
 npm test
 # or
 cd backend && npm test
+cd frontend && npm test
 ```
+
+Manual QA and API smoke examples: see **`docs/QA-MANUAL-CHECKLIST.md`**, **`docs/QA-ENGINEERING-REPORT.md`**, and **`docs/smoke-api.http`**.
 
 ## Deployment
 

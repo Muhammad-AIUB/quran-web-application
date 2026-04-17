@@ -1,9 +1,15 @@
 "use client";
 
+import {
+  clampArabicSize,
+  clampTranslationSize,
+  sanitizeArabicFont,
+  type ArabicFontId,
+} from "@/lib/fontSettings";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-export type ArabicFontId = "amiri" | "scheherazade";
+export type { ArabicFontId };
 
 export interface SettingsState {
   arabicFont: ArabicFontId;
@@ -14,23 +20,26 @@ export interface SettingsState {
   setTranslationSize: (n: number) => void;
 }
 
-const clamp = (n: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, n));
-
 export const useSettingsStore = create<SettingsState>()(
   persist(
     (set) => ({
       arabicFont: "amiri" as ArabicFontId,
       arabicSize: 28,
       translationSize: 17,
-      setArabicFont: (arabicFont) => set({ arabicFont }),
-      setArabicSize: (n) => set({ arabicSize: clamp(n, 20, 48) }),
-      setTranslationSize: (n) => set({ translationSize: clamp(n, 12, 26) }),
+      setArabicFont: (arabicFont) => set({ arabicFont: sanitizeArabicFont(arabicFont) }),
+      setArabicSize: (n) => set({ arabicSize: clampArabicSize(n) }),
+      setTranslationSize: (n) => set({ translationSize: clampTranslationSize(n) }),
     }),
     {
       name: "quran-web-settings",
       storage: createJSONStorage(() => localStorage),
       version: 1,
+      onRehydrateStorage: () => (state, error) => {
+        if (error || !state) return;
+        state.arabicFont = sanitizeArabicFont(state.arabicFont);
+        state.arabicSize = clampArabicSize(state.arabicSize);
+        state.translationSize = clampTranslationSize(state.translationSize);
+      },
     },
   ),
 );

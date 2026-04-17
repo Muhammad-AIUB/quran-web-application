@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { SearchHit, SearchIndexRow, SurahDetail, SurahSummary } from "../types.js";
+import { normalizeTranslation } from "../utils/normalizeTranslation.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -9,13 +10,6 @@ function defaultDataDir(): string {
   const fromEnv = process.env.DATA_DIR;
   if (fromEnv) return fromEnv;
   return join(__dirname, "..", "..", "data");
-}
-
-function normalizeTranslation(s: string): string {
-  return s
-    .toLowerCase()
-    .normalize("NFKD")
-    .replace(/\p{M}/gu, "");
 }
 
 type RawSurahMeta = SurahSummary & { link?: string };
@@ -42,16 +36,17 @@ export class QuranService {
       this.surahById.set(meta.id, detail);
 
       for (const v of detail.verses) {
+        const translationText = typeof v.translation === "string" ? v.translation : "";
         rows.push({
           surahId: meta.id,
           ayahNumber: v.id,
           surahNameArabic: detail.name,
           surahTransliteration: detail.transliteration,
           surahTranslation: detail.translation,
-          text: v.text,
-          translation: v.translation,
-          transliteration: v.transliteration,
-          translationNormalized: normalizeTranslation(v.translation),
+          text: typeof v.text === "string" ? v.text : "",
+          translation: translationText,
+          transliteration: typeof v.transliteration === "string" ? v.transliteration : "",
+          translationNormalized: normalizeTranslation(translationText),
         });
       }
     }
