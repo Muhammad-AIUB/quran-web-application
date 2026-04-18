@@ -190,6 +190,14 @@ Use **two Vercel projects** connected to the same Git repository, with different
 - On the API, set **`CORS_ORIGIN`** to your site origin(s), e.g. `https://your-app.vercel.app` (scheme + host must match what the browser shows; add preview URLs if needed).
 - The site is served over **HTTPS**; the API URL must be **HTTPS** too, or the browser blocks mixed content.
 
+**Still broken after setting `NEXT_PUBLIC_API_URL`?**  
+`NEXT_PUBLIC_*` belongs on the **frontend** project; **`CORS_ORIGIN` belongs on the API project** (`quran-web-application-six`). If the API env is missing or still `localhost`, the browser blocks `fetch` from your live site (check DevTools → **Console** for a CORS error, or **Network** → failed request → (blocked)). Fix:
+
+1. Open the **API** Vercel project → **Settings → Environment Variables**.
+2. Add **`CORS_ORIGIN`** = your **frontend** origin only (copy from the browser address bar: `https` + host, no path, no trailing slash), e.g. `https://<your-frontend>.vercel.app`. Use commas to allow multiple origins (production + preview URLs).
+3. **Redeploy the API** (Deployments → … → Redeploy) so serverless functions pick up the new env.
+4. On the **frontend** project, confirm **`NEXT_PUBLIC_API_URL`** is set and trigger a **new production deployment** after any env change (the value is fixed at **build** time).
+
 ### Other hosts (traditional Node server)
 
 - **Backend (e.g. Render, Railway):** Root **`backend`**. Build: `npm install && npm run build`. Start: `npm start`. Set **`PORT`** if the platform does not inject it. Set **`CORS_ORIGIN`** as above.  
