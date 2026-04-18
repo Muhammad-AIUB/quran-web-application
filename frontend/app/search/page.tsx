@@ -3,7 +3,7 @@
 import { PageHeader } from "@/components/PageHeader";
 import { SearchBar } from "@/components/SearchBar";
 import { SearchResultCard } from "@/components/SearchResultCard";
-import { fetchSearch } from "@/utils/api";
+import { fetchSearch, isDeployedSiteUsingLocalApiFallback } from "@/utils/api";
 import { isAbortError } from "@/utils/abortError";
 import type { SearchHit } from "@/utils/types";
 import { useDebouncedValue } from "@/utils/useDebouncedValue";
@@ -36,7 +36,15 @@ export default function SearchPage() {
       })
       .catch((e: unknown) => {
         if (isAbortError(e)) return;
-        setError("Could not reach the search service. Check that the API is running.");
+        if (isDeployedSiteUsingLocalApiFallback()) {
+          setError(
+            "Search needs a public API URL. In Vercel → Settings → Environment Variables, set NEXT_PUBLIC_API_URL to your deployed API (https, no trailing slash), then redeploy the frontend. Local dev defaults to http://localhost:8787 and is not used on production hosts.",
+          );
+          return;
+        }
+        setError(
+          "Could not reach the search service. Confirm the API is up, NEXT_PUBLIC_API_URL points to it, and the API’s CORS_ORIGIN includes this site’s exact origin (https + host).",
+        );
       })
       .finally(() => {
         if (!ac.signal.aborted) setLoading(false);

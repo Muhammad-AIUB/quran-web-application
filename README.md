@@ -184,6 +184,12 @@ Use **two Vercel projects** connected to the same Git repository, with different
 
 3. **Smoke-check after deploy:** open `https://<api>/health`, then load the site and run a translation search once CORS and `NEXT_PUBLIC_API_URL` are set.
 
+**Search works locally but errors in production**
+
+- The frontend defaults to `http://localhost:8787` when **`NEXT_PUBLIC_API_URL` is unset at build time**. In the browser that means “your computer,” not the deployed API — search will fail on Vercel until you set **`NEXT_PUBLIC_API_URL`** to your API’s public **HTTPS** URL (no trailing slash) and **redeploy** the frontend.
+- On the API, set **`CORS_ORIGIN`** to your site origin(s), e.g. `https://your-app.vercel.app` (scheme + host must match what the browser shows; add preview URLs if needed).
+- The site is served over **HTTPS**; the API URL must be **HTTPS** too, or the browser blocks mixed content.
+
 ### Other hosts (traditional Node server)
 
 - **Backend (e.g. Render, Railway):** Root **`backend`**. Build: `npm install && npm run build`. Start: `npm start`. Set **`PORT`** if the platform does not inject it. Set **`CORS_ORIGIN`** as above.  
