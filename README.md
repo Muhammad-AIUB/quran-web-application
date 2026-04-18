@@ -39,6 +39,22 @@ User → Next.js (static pages + client fetch) → Hono API → in-memory JSON (
 - **Surah list and ayah pages** are generated from JSON in `frontend/data` at build time (SSG).
 - **Search** calls the API (`GET /search`), which queries the in-memory index derived from `backend/data`.
 
+## Performance
+
+**Frontend**
+
+- **Fonts:** Inter is preloaded for UI text; Arabic fonts (Amiri, Scheherazade New) use the **Arabic** subset, **weight 400**, and **`preload: false`** so they load when reading views need them, reducing initial download and main-thread work.
+- **Surah index:** `Link` to each surah uses **`prefetch={false}`** so Next.js does not prefetch dozens of routes in the background.
+- **Long surahs:** Ayah blocks use **`content-visibility: auto`** (with intrinsic-size hints) to lighten layout/paint off-screen verses; **`useSettings()`** runs once per surah list and passes props into each ayah to avoid redundant context work.
+- **Search client:** `fetch` uses the default cache so **HTTP `Cache-Control`** from the API can apply on repeat queries.
+- **`next.config`:** `poweredByHeader: false`.
+
+**Backend**
+
+- **`Cache-Control`** on JSON responses: longer TTL + `stale-while-revalidate` for **`/surahs`** and **`/surah/:id`**; shorter TTL for **`/search`** so browsers and CDNs can cache safely.
+
+**Note:** Cold starts on **serverless** hosts can still add latency on the first API request after idle; caching and fewer prefetches improve typical navigation.
+
 ## Folder Structure
 
 ```
@@ -148,6 +164,7 @@ Query length is capped server-side (very long input is truncated before search).
 
 - **Smoke testing** — Run API (`/health`, `/surahs`, `/surah/1`, `/search?q=mercy`) and open main UI flows (list → surah → search). Example HTTP requests: `docs/smoke-api.http`.
 - **Automated** — `npm test` at repo root runs backend + frontend Vitest suites (route/service behavior, utilities).
+- **Typecheck** — `npx tsc --noEmit` in `frontend/` and `backend/`, or `npm run build` in each package (Next runs typecheck + lint on build).
 - **Settings persistence (`localStorage`)** — Manually verified across **normal page reload**, **hard reload** (bypass cache), and **new browser session** (same origin): typography choices remain applied and match DevTools → Application → Local Storage.
 - **Manual checklist (short)**  
   - Surah list loads and links resolve for several ids (1, 2, 114).  
@@ -162,7 +179,7 @@ Query length is capped server-side (very long input is truncated before search).
 - Dark mode (additional palettes, contrast, scheduling)
 - Offline support (PWA, cached surah JSON)
 - Advanced search indexing (fuzzy match, optional Arabic token search)
-- Performance optimizations (bundle splitting, font strategy, HTTP caching)
+- Virtualized scrolling for very long surahs; further bundle splitting if metrics warrant it
 
 ## Deployment
 
@@ -191,7 +208,7 @@ Use **two Vercel projects** connected to the same Git repository, with different
 - The site is served over **HTTPS**; the API URL must be **HTTPS** too, or the browser blocks mixed content.
 
 **Still broken after setting `NEXT_PUBLIC_API_URL`?**  
-`NEXT_PUBLIC_*` belongs on the **frontend** project; **`CORS_ORIGIN` belongs on the API project** (`quran-web-application-six`). If the API env is missing or still `localhost`, the browser blocks `fetch` from your live site (check DevTools → **Console** for a CORS error, or **Network** → failed request → (blocked)). Fix:
+`NEXT_PUBLIC_*` belongs on the **frontend** project; **`CORS_ORIGIN` belongs on the API project**. If the API env is missing or still `localhost`, the browser blocks `fetch` from your live site (check DevTools → **Console** for a CORS error, or **Network** → failed request → (blocked)). Fix:
 
 1. Open the **API** Vercel project → **Settings → Environment Variables**.
 2. Add **`CORS_ORIGIN`** = your **frontend** origin only (copy from the browser address bar: `https` + host, no path, no trailing slash), e.g. `https://<your-frontend>.vercel.app`. Use commas to allow multiple origins (production + preview URLs).

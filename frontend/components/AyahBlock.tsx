@@ -1,6 +1,6 @@
 "use client";
 
-import { useSettings } from "@/context/SettingsContext";
+import type { ArabicFontId } from "@/context/SettingsContext";
 import type { Verse } from "@/utils/types";
 import { cn } from "@/utils/cn";
 import { memo } from "react";
@@ -8,12 +8,16 @@ import { memo } from "react";
 export const AyahBlock = memo(function AyahBlock({
   verse,
   surahId,
+  arabicFont,
+  arabicSize,
+  translationSize,
 }: {
   verse: Verse;
   surahId: number;
+  arabicFont: ArabicFontId;
+  arabicSize: number;
+  translationSize: number;
 }) {
-  const { arabicFont, arabicSize, translationSize } = useSettings();
-
   const arabicFamily =
     arabicFont === "amiri"
       ? "var(--font-amiri), serif"
@@ -25,6 +29,7 @@ export const AyahBlock = memo(function AyahBlock({
       className={cn(
         "group scroll-mt-28 rounded-2xl border border-transparent px-3 py-6 transition-colors sm:px-4",
         "hover:border-zinc-200/90 hover:bg-white hover:shadow-sm dark:hover:border-zinc-700 dark:hover:bg-zinc-900/50",
+        "[content-visibility:auto] [contain-intrinsic-size:auto_14rem]",
       )}
     >
       <div className="mb-4 flex justify-end sm:mb-5">

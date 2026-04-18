@@ -12,6 +12,7 @@ function parseLimit(raw: string | undefined, fallback: number): number {
 const MAX_QUERY_LEN = 4000;
 
 function listSurahs(c: Context) {
+  c.header("Cache-Control", "public, max-age=900, s-maxage=86400, stale-while-revalidate=604800");
   return c.json({ data: quranService.getSurahs() });
 }
 
@@ -22,6 +23,7 @@ function getSurahById(c: Context) {
   }
   const surah = quranService.getSurah(id);
   if (!surah) return c.json({ error: "Surah not found" }, 404);
+  c.header("Cache-Control", "public, max-age=900, s-maxage=86400, stale-while-revalidate=604800");
   return c.json({ data: surah });
 }
 
@@ -30,6 +32,7 @@ function searchAyahs(c: Context) {
   if (q.length > MAX_QUERY_LEN) q = q.slice(0, MAX_QUERY_LEN);
   const limit = parseLimit(c.req.query("limit"), 120);
   const hits = quranService.search(q, limit);
+  c.header("Cache-Control", "public, max-age=60, s-maxage=300, stale-while-revalidate=60");
   return c.json({ data: hits, query: q.trim() });
 }
 

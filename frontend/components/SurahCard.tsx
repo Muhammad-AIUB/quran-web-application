@@ -5,6 +5,7 @@ export function SurahCard({ surah }: { surah: SurahSummary }) {
   return (
     <Link
       href={`/surah/${surah.id}`}
+      prefetch={false}
       className="group flex min-h-[4.5rem] w-full min-w-0 items-start justify-between gap-3 rounded-2xl border border-zinc-200/90 bg-white p-4 shadow-sm transition duration-200 hover:border-emerald-200 hover:shadow-md active:scale-[0.99] dark:border-zinc-800 dark:bg-zinc-900/80 dark:hover:border-emerald-800/60 md:min-h-0"
       suppressHydrationWarning
     >

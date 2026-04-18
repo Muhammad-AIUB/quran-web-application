@@ -10,20 +10,23 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
+  preload: true,
 });
 
 const amiri = Amiri({
-  weight: ["400", "700"],
-  subsets: ["arabic", "latin"],
+  weight: ["400"],
+  subsets: ["arabic"],
   variable: "--font-amiri",
   display: "swap",
+  preload: false,
 });
 
 const scheherazade = Scheherazade_New({
-  weight: ["400", "700"],
-  subsets: ["arabic", "latin"],
+  weight: ["400"],
+  subsets: ["arabic"],
   variable: "--font-scheherazade",
   display: "swap",
+  preload: false,
 });
 
 export const metadata: Metadata = {

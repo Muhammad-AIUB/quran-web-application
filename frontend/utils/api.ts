@@ -31,7 +31,8 @@ export async function fetchSearch(
   const params = new URLSearchParams({ q });
   const res = await fetch(`${getApiBaseUrl()}/search?${params.toString()}`, {
     signal,
-    cache: "no-store",
+    // Respect API Cache-Control (short TTL); avoids duplicate work on back/forward and repeated queries.
+    cache: "default",
   });
   if (!res.ok) throw new Error("Search failed");
   const json: unknown = await res.json();
